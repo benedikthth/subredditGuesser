@@ -1,0 +1,27 @@
+.inputRow {
+  display: block;
+  margin: 0 auto;
+}
+
+.inputDiv{
+  width: 100%;
+  text-align: center;
+}
+
+input {
+  border: 2px solid;
+}
+
+input.valid {
+  border-color: green;
+}
+
+input.invalid {
+  border-color: red;
+}
+
+button.main{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
