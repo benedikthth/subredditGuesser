@@ -2,26 +2,56 @@
 
 var GuessReddit = {
   //ELEMENTS
+  mainInputDiv: null,
   inputDiv: null,
   addButton: null,
   goButton: null,
+  gameDiv: null,
   //LISTS
   inputs: [],
+  subredditTitlePairs: null,
+
+
+  element: function(type){
+    var e = document.createElement(type);
+    e.show = function(){
+      this.style.display = "";
+    }.bind(e);
+    e.hide = function(){
+      this.style.display = "none";
+    }.bind(e);
+    return e;
+  },
+
+
 
   init: function(){
-    this.addButton = document.createElement('button');
-    this.inputDiv = document.createElement('div');
+
+    if(!window.nEl){
+      window.nEl = this.element;
+    }
+
+    this.mainInputDiv = nEl('div');
+    this.addButton = nEl('button');//this.element('button');//document.createElement('button');
+    this.inputDiv = nEl('div');//document.createElement('div');
     this.inputDiv.classList.add('inputDiv');
     this.goButton = document.createElement('button');
     this.addButton.innerHTML = "ADD";
     this.goButton.innerHTML = "GO";
     this.addButton.classList.add('main');
     this.goButton.classList.add('main');
-    document.body.appendChild(this.addButton);
-    document.body.appendChild(this.inputDiv);
-    document.body.appendChild(this.goButton);
+    this.mainInputDiv.appendChild(this.addButton);
+    this.mainInputDiv.appendChild(this.inputDiv);
+    this.mainInputDiv.appendChild(this.goButton);
+
+    document.body.appendChild(this.mainInputDiv);
     this.addButton.onclick = this.addTextInput.bind(this);
     this.goButton.onclick = this.startGame.bind(this);
+
+    this.gameDiv = nEl('div');//this.element('div');//document.createElement('div');
+    this.gameDiv.hide();
+
+
   },
 
   addTextInput: function(){
@@ -87,6 +117,7 @@ var GuessReddit = {
     request.onreadystatechange = function(){
       if(request.readyState === 4){ // complete
         if(request.status === 200){ // all ist ok
+          this.titles = [];
           JSON.parse(request.responseText).data.children.forEach(x=>this.titles.push(x.data.title));
           this.success();
         } else {
@@ -95,7 +126,7 @@ var GuessReddit = {
       }
     }.bind(this);
 
-    var text = "http://www.reddit.com/r/" + subreddit + "/.json?sort=new";
+    var text = "http://www.reddit.com/r/" + subreddit + ".json?limit=50";
 
     request.open("GET", text);//"https://api.reddit.com/r/"+subreddit);
     request.setRequestHeader('Content-Type', 'text/plain');
@@ -105,20 +136,36 @@ var GuessReddit = {
 
   startGame: function(){
     if(this.readyCheck()){
+      this.mainInputDiv.hide();
+      this.subredditTitlePairs = [];
+      this.inputs.forEach(x=> this.subredditTitlePairs.push( {name: x.subreddit, titles: x.titles}));
+
     } else {
       alert('Please enter at least 5 valid subreddits.');
     }
   },
 
   readyCheck: function(){
-    if(this.inputs.length >= 5 && this.inputs.filter(x=>!x.valid).length == 0){
+    if(this.inputs.length >= 3 && this.inputs.filter(x=>!x.valid).length == 0){
       return true;
     } else {
       return false;
     }
 
-  }
+  },
 
+  getQuestion: function(){
+
+    if(this.subredditTitlePairs !== null){
+      var i = Math.floor(Math.random() * this.subredditTitlePairs.length );
+      var selected = this.subredditTitlePairs[i];
+      var title = selected.titles[Math.floor(Math.random() * selected.titles.length)];
+      var returnValue = {answer: selected.name, question: title};
+      return returnValue;
+    } else {
+      //this.error('Subreddit pairs is not initialized');
+    }
+  }
 
 
 }
