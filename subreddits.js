@@ -2,12 +2,21 @@
 
 var GuessReddit = {
   //ELEMENTS
-  mainInputDiv: null,
+  //main divs
+  playerSelectionDiv: null, //choose players playing.
+  mainInputDiv: null, //subreddit input
+  gameDiv: null, // actual game representation
+  //lesser divs
+    //player selection
+  playerListDiv: null,
+  playersReadyButton: null,
+    //subreddit divs
   inputDiv: null,
   addButton: null,
   goButton: null,
-  gameDiv: null,
   //LISTS
+  playerInputs: [],
+  players: [],
   inputs: [],
   subredditTitlePairs: null,
 
@@ -15,10 +24,10 @@ var GuessReddit = {
   element: function(type){
     var e = document.createElement(type);
     e.show = function(){
-      this.style.display = "";
+      this.classList.remove('HIDDEN');
     }.bind(e);
     e.hide = function(){
-      this.style.display = "none";
+      this.classList.add('HIDDEN')
     }.bind(e);
     return e;
   },
@@ -30,7 +39,26 @@ var GuessReddit = {
     if(!window.nEl){
       window.nEl = this.element;
     }
+    /*Player input*/
+    this.playerSelectionDiv = nEl('div');
+    this.playerListDiv = nEl('div');
+    //this.addPlayerInput();
+    this.addPlayerButton = nEl('button');
+    this.addPlayerButton.onclick = this.addPlayerInput.bind(this);
+    this.addPlayerButton.innerHTML = 'Add Player';
+    this.playerSelectionDiv.appendChild(this.addPlayerButton);
+    this.playerSelectionDiv.appendChild(this.playerListDiv);
+    this.playersReadyButton = nEl('button');
+    this.playersReadyButton.classList.add('main');
+    this.playersReadyButton.onclick = function(){
+      this.playerSelectionDiv.hide();
+      this.mainInputDiv.show();
+    }.bind(this);
+    this.playerSelectionDiv.appendChild(this.playersReadyButton);
+    document.body.appendChild(this.playerSelectionDiv);
 
+    /*</player input>*/
+    /*Subreddit input*/
     this.mainInputDiv = nEl('div');
     this.addButton = nEl('button');//this.element('button');//document.createElement('button');
     this.inputDiv = nEl('div');//document.createElement('div');
@@ -43,16 +71,47 @@ var GuessReddit = {
     this.mainInputDiv.appendChild(this.addButton);
     this.mainInputDiv.appendChild(this.inputDiv);
     this.mainInputDiv.appendChild(this.goButton);
-
     document.body.appendChild(this.mainInputDiv);
+    /*</subreddit input>*/
     this.addButton.onclick = this.addTextInput.bind(this);
     this.goButton.onclick = this.startGame.bind(this);
-
+    /*<actual game> */
     this.gameDiv = nEl('div');//this.element('div');//document.createElement('div');
+    /*</actual game> */
+    //show playerSelectionDiv. hide the rest.
+    this.mainInputDiv.hide();
     this.gameDiv.hide();
 
 
   },
+
+  addPlayerInput: function(){
+    var input = document.createElement('input');
+    this.playerInputs.push(input);
+    var deleteInputButton = document.createElement('button');
+    deleteInputButton.innerHTML = 'X';
+    var inputRowElement = document.createElement('div');
+    inputRowElement.classList.add('inputRow');
+    input.onchange = function(){
+      if(input.value !== "" && input.value !== null){
+        this.players = [];
+        this.playerInputs.forEach(x=>this.players.push(x.value));
+        console.log(this.players);
+      }
+    }.bind(this);
+    deleteInputButton.onclick = function(inp){
+      var inputRow = inp.inputRow;
+      console.log(inp);
+      this.players.splice(this.players.indexOf(inp.value), 1);
+      this.playerInputs.splice(this.playerInputs.indexOf(inp), 1);
+      this.playerListDiv.removeChild(inputRow);
+    }.bind(this, input);
+    inputRowElement.appendChild(input);
+    input.inputRow = inputRowElement;
+    inputRowElement.appendChild(deleteInputButton);
+    this.playerListDiv.appendChild(inputRowElement);
+  },
+
 
   addTextInput: function(){
     var input = document.createElement('input');
