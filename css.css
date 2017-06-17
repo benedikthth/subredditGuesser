@@ -3,7 +3,7 @@
   margin: 0 auto;
 }
 
-.inputDiv{
+.mainDiv{
   width: 100%;
   text-align: center;
 }
@@ -28,4 +28,12 @@ button.main{
 
 .HIDDEN {
   display: none;
+}
+
+.scoreContainer {
+  display: inline-block;
+  margin: 4px 4px 4px 4px;
+  padding: 4px 4px 4px 4px;
+  border: 2px solid black;
+  border-radius: 10px;
 }
